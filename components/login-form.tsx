@@ -35,7 +35,7 @@ export function LoginForm({
   const [isLoading, setIsLoading] = useState(false)
 
   // 1. Handle Email/Password Login
-  async function onSubmit(event: React.SubmitEvent<HTMLFormElement>) {
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsLoading(true)
 
@@ -71,7 +71,7 @@ export function LoginForm({
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>
-            Login with your GitHub or Google account
+            Login to your account with email or OAuth
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -153,6 +153,7 @@ export function LoginForm({
                   id="password" 
                   name="password" // <--- Important for FormData
                   type="password" 
+                  placeholder="*******"
                   required 
                   disabled={isLoading}
                 />
@@ -163,9 +164,14 @@ export function LoginForm({
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Login
                 </Button>
-                <FieldDescription className="text-center">
-                  Don&apos;t have an account? <Link href="/signup" className="text-primary hover:underline">Sign up</Link>
-                </FieldDescription>
+                <div className="text-center text-sm text-gray-600">
+                  Don&apos;t have an account? 
+                  <div className="mt-2 text-xs">
+                    <Link href="/signup/client" className="text-primary hover:underline">Sign up as Client</Link>
+                    {" • "}
+                    <Link href="/signup/business" className="text-primary hover:underline">Sign up as Business</Link>
+                  </div>
+                </div>
               </Field>
             </FieldGroup>
           </form>
