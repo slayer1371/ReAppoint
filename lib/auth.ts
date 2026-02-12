@@ -70,6 +70,26 @@ export const authOptions: NextAuthOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET, 
   callbacks: {
+    // Create ClientProfile on first OAuth login
+    async signIn({ user, account }) {
+      // Only for OAuth providers (GitHub, Google)
+      if (account?.provider === "github" || account?.provider === "google") {
+        // Check if ClientProfile exists
+        const existingProfile = await prisma.clientProfile.findUnique({
+          where: { userId: user.id }
+        })
+        
+        // Create if doesn't exist
+        if (!existingProfile) {
+          await prisma.clientProfile.create({
+            data: {
+              userId: user.id
+            }
+          })
+        }
+      }
+      return true
+    },
     // This helper makes the user ID and role available to your dashboard later
     async jwt({ token, user }) {  
       if (user) {
