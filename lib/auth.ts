@@ -94,7 +94,11 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {  
       if (user) {
         token.id = user.id;
-        token.role = user.role;
+        // Fetch role from database
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id }
+        });
+        token.role = dbUser?.role || "client";
       }
       return token;
     },
