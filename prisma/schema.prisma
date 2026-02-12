@@ -2,6 +2,8 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// so user b is in waitlist right now. when user a cancels his appointment, slots will be available for user b. but can't send an email to user b, because resend doesn't let you if you don't have a domain
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -100,14 +102,15 @@ model Service {
   noShowRiskMult  Float  @default(1.0) // Service-specific risk multiplier
   business        BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
   appointments    Appointment[]
-  
+  waitlistEntries  Waitlist[]
+
   @@unique([businessId, name])
 }
 
 model Appointment {
   id                String    @id @default(cuid())
   businessId        String
-  clientId          String
+  clientId          String 
   serviceId         String
   datetime          DateTime
   durationMins      Int
@@ -146,11 +149,15 @@ model Waitlist {
   id               String   @id @default(cuid())
   clientId         String
   businessId       String
-  preferredServices String[]
-  maxPrice         Float?
-  flexibleTimes    Json?    // Store time preferences
+  serviceId        String
+  position         Int      // Queue position (1 = first in line)
+  status           String   @default("waiting") // waiting|offered|accepted|declined|expired
+  offerExpiresAt   DateTime? // 24hr window to accept offer
   createdAt        DateTime @default(now())
   
   client           ClientProfile   @relation(fields: [clientId], references: [id], onDelete: Cascade)
   business         BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  service          Service         @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  
+  @@unique([clientId, businessId, serviceId]) // Can't join same waitlist twice
 }
