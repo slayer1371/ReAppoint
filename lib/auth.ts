@@ -27,9 +27,6 @@ declare module "next-auth/jwt" {
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: "jwt", 
-  },
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID!,
@@ -46,68 +43,92 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" , placeholder : "***********"}
       },
       authorize: async (credentials) => {
-        if(!credentials?.email || !credentials?.password) {
-          throw new Error("Email and password are required")
+        try {
+          if(!credentials?.email || !credentials?.password) {
+            return null
+          }
+          
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+
+          if(!user || !user.password) {
+            return null
+          }
+
+          const isCorrectPassword = await bcrypt.compare(credentials.password, user.password)
+
+          if(!isCorrectPassword) {
+            return null
+          }
+
+          return user;
+        } catch (error) {
+          console.error("Auth error:", error)
+          return null
         }
-        // Add your own logic here to find the user and verify the password
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if(!user || !user.password) {
-          throw new Error("No user found with the given email")
-        }
-
-        const isCorrectPassword = await bcrypt.compare(credentials.password, user.password)
-
-        if(!isCorrectPassword) {
-          throw new Error("Incorrect password")
-        }
-
-        return user;
       }
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET, 
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+  }, 
   callbacks: {
-    // Create ClientProfile on first OAuth login
+    // Create ClientProfile on first OAuth login and allow credentials login
     async signIn({ user, account }) {
-      // Only for OAuth providers (GitHub, Google)
-      if (account?.provider === "github" || account?.provider === "google") {
-        // Check if ClientProfile exists
-        const existingProfile = await prisma.clientProfile.findUnique({
-          where: { userId: user.id }
-        })
-        
-        // Create if doesn't exist
-        if (!existingProfile) {
-          await prisma.clientProfile.create({
-            data: {
-              userId: user.id
-            }
+      try {
+        // Only for OAuth providers (GitHub, Google)
+        if (account?.provider === "github" || account?.provider === "google") {
+          // Check if ClientProfile exists
+          const existingProfile = await prisma.clientProfile.findUnique({
+            where: { userId: user.id }
           })
+          
+          // Create if doesn't exist
+          if (!existingProfile) {
+            await prisma.clientProfile.create({
+              data: {
+                userId: user.id
+              }
+            })
+          }
         }
+        // For credentials, just allow login (no additional setup needed)
+        return true
+      } catch (error) {
+        console.error("SignIn error:", error)
+        return false
       }
-      return true
     },
     // This helper makes the user ID and role available to your dashboard later
     async jwt({ token, user }) {  
-      if (user) {
-        token.id = user.id;
-        // Fetch role from database
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id }
-        });
-        token.role = dbUser?.role || "client";
+      try {
+        if (user) {
+          token.id = user.id;
+          // Fetch role from database
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id }
+          });
+          token.role = dbUser?.role || "client";
+        }
+        return token;
+      } catch (error) {
+        console.error("JWT callback error:", error)
+        return token
       }
-      return token;
     },
     session: async ({ session, token }) => {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
+      try {
+        if (session.user) {
+          session.user.id = token.id as string;
+          session.user.role = token.role as string;
+        }
+        return session;
+      } catch (error) {
+        console.error("Session callback error:", error)
+        return session
       }
-      return session;
     },
   },
   pages: {
