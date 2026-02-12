@@ -1,16 +1,17 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { CheckCircle2, Users, BarChart3, Bell, Zap, TrendingUp } from "lucide-react"
 
 export default function Home() {
   // Middleware handles redirects - no session checking needed here
-  // This page renders immediately without waiting
-  
+  // This page renders immediately without wait
+
+  //remember mutiple workers in a business, not a single resource.
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
+    <div className="min-h-screen bg-linear-to-b from-white to-slate-50">
       {/* Hero Section */}
       <section className="px-4 py-16 md:py-24 max-w-6xl mx-auto">
         <div className="text-center space-y-8">
@@ -153,15 +154,15 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-gray-900">Reduce No-Shows</h3>
               <ul className="space-y-3">
                 <li className="flex gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <span className="text-gray-600">AI-powered client risk assessment</span>
                 </li>
                 <li className="flex gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <span className="text-gray-600">Automated confirmation reminders</span>
                 </li>
                 <li className="flex gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <span className="text-gray-600">Last-minute slot optimization</span>
                 </li>
               </ul>
@@ -171,15 +172,15 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-gray-900">Maximize Revenue</h3>
               <ul className="space-y-3">
                 <li className="flex gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <span className="text-gray-600">Fill slots with discounted offers</span>
                 </li>
                 <li className="flex gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <span className="text-gray-600">Waitlist management</span>
                 </li>
                 <li className="flex gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <span className="text-gray-600">Detailed revenue analytics</span>
                 </li>
               </ul>
