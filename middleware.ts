@@ -11,14 +11,14 @@ export async function middleware(request: NextRequest) {
   // If authenticated user tries to access auth routes, redirect to dashboard
   if (isAuthenticated && (pathname.startsWith("/login") || pathname.startsWith("/signup") || pathname.startsWith("/(auth)"))) {
     const role = (token as any)?.role
-    const dashboardUrl = role === "business" ? "/dashboard" : "/appointments"
+    const dashboardUrl = role === "business" ? "/business/dashboard" : "/appointments"
     return NextResponse.redirect(new URL(dashboardUrl, request.url))
   }
 
   // If authenticated user goes to home page, redirect to appropriate dashboard
   if (isAuthenticated && pathname === "/") {
     const role = (token as any)?.role
-    const dashboardUrl = role === "business" ? "/dashboard" : "/appointments"
+    const dashboardUrl = role === "business" ? "/business/dashboard" : "/appointments"
     return NextResponse.redirect(new URL(dashboardUrl, request.url))
   }
 
