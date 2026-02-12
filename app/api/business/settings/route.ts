@@ -106,7 +106,7 @@ export async function PUT(req: Request) {
       phone: updated.phone,
       noShowThreshold: updated.noShowThreshold,
       requireDepositForHighRisk: updated.requireDepositForHighRisk,
-      settings: updated.settings ? JSON.parse(updated.settings) : null
+      settings: updated.settings ? JSON.parse(updated.settings as string) : null
     });
   } catch (error) {
     console.error("Error updating settings:", error);
