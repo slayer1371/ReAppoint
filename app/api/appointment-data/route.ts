@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendBookingConfirmationEmail } from "@/lib/mail";
 import { getServerSession } from "next-auth";
 
 export async function GET() {
@@ -192,6 +193,22 @@ export async function POST(req: Request) {
             totalAppointments: { increment: 1 }
         }
     })
+
+    // Send booking confirmation email
+    try {
+        await sendBookingConfirmationEmail(
+            session.user.email!,
+            session.user.name || "Client",
+            business.businessName,
+            service.name,
+            appointmentDate,
+            service.durationMins,
+            service.basePrice
+        );
+    } catch (error) {
+        console.error("Failed to send booking confirmation email:", error);
+        // Don't fail appointment creation if email fails
+    }
 
     // If user was on waitlist, remove them now that they've booked
     if (waitlistId) {
