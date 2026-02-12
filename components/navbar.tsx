@@ -45,10 +45,10 @@ export function Navbar() {
   ]
 
   const businessLinks = [
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/appointments", label: "Appointments" },
-    { href: "/services", label: "Services" },
-    { href: "/settings", label: "Settings" },
+    { href: "/business/dashboard", label: "Dashboard" },
+    { href: "/business/appointments", label: "Appointments" },
+    { href: "/business/services", label: "Services" },
+    { href: "/business/settings", label: "Settings" },
   ]
 
   const navLinks = isClient ? clientLinks : isBusiness ? businessLinks : []
