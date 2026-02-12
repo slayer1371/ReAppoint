@@ -12,6 +12,7 @@ interface SlotPickerProps {
     businessId: string
     selectedDate: string
     serviceId?: string
+    durationMins?: number
     onSelectTime: (time: string) => void
     onNoSlots?: (hasNoSlots: boolean) => void
     selectedTime?: string
@@ -22,6 +23,7 @@ export function SlotPicker({
     businessId, 
     selectedDate,
     serviceId,
+    durationMins = 60,
     onSelectTime,
     onNoSlots,
     selectedTime,
@@ -51,7 +53,48 @@ export function SlotPicker({
                 const res = await fetch(url.toString())
                 if (!res.ok) throw new Error("Failed to fetch available slots")
                 const data = await res.json()
-                setSlots(data.slots || [])
+                
+                // Filter out past times if selected date is today
+                let slots = data.slots || []
+                const now = new Date()
+                
+                // Parse selected date (format: YYYY-MM-DD)
+                const [year, month, day] = selectedDate.split("-").map(Number)
+                const selectedDay = new Date(year, month - 1, day)
+                
+                // Check if today
+                const isToday = (
+                    selectedDay.getFullYear() === now.getFullYear() &&
+                    selectedDay.getMonth() === now.getMonth() &&
+                    selectedDay.getDate() === now.getDate()
+                )
+                
+                // Filter slots: remove past times and times where appointment wouldn't fit
+                // Assume business closes at 6 PM (18:00)
+                const BUSINESS_CLOSING_HOUR = 18
+                
+                slots = slots.filter((slot: TimeSlot) => {
+                    const [slotHour, slotMin] = slot.time.split(":").map(Number)
+                    const slotTime = new Date(year, month - 1, day, slotHour, slotMin)
+                    
+                    // Filter 1: If today, remove past times
+                    if (isToday && slotTime <= now) {
+                        return false
+                    }
+                    
+                    // Filter 2: Check if appointment duration would fit before closing
+                    const appointmentEndTime = new Date(slotTime)
+                    appointmentEndTime.setMinutes(appointmentEndTime.getMinutes() + durationMins)
+                    
+                    if (appointmentEndTime.getHours() > BUSINESS_CLOSING_HOUR || 
+                        (appointmentEndTime.getHours() === BUSINESS_CLOSING_HOUR && appointmentEndTime.getMinutes() > 0)) {
+                        return false // Appointment would go past closing time
+                    }
+                    
+                    return true
+                })
+                
+                setSlots(slots)
             } catch (err) {
                 setError(err instanceof Error ? err.message : "Failed to load time slots")
             } finally {

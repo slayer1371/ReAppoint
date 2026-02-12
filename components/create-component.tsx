@@ -321,6 +321,7 @@ export default function CreateAppointment() {
                                     businessId={selectedBusiness}
                                     selectedDate={appointmentDate}
                                     serviceId={selectedService}
+                                    durationMins={selectedServiceData?.durationMins}
                                     onSelectTime={setAppointmentTime}
                                     onNoSlots={setNoAvailableSlots}
                                     selectedTime={appointmentTime}
@@ -328,10 +329,15 @@ export default function CreateAppointment() {
                                 />
                                 
                                 {/* Join Waitlist Option */}
-                                {noAvailableSlots && (
+                                {noAvailableSlots && selectedServiceData && (
                                     <Card className="border-blue-200 bg-blue-50 p-4 mt-4">
                                         <p className="text-sm text-blue-800 mb-3">
-                                            All slots are booked for this date. Join the waitlist to get notified when a slot becomes available!
+                                            No available slots for {selectedServiceData.name} ({selectedServiceData.durationMins} mins) on this date.
+                                            {" "}
+                                            <br />
+                                            {selectedServiceData.durationMins > 120 
+                                                ? "Try selecting an earlier date, or join the waitlist."
+                                                : "Join the waitlist to get notified when a slot becomes available!"}
                                         </p>
                                         <Button
                                             type="button"
