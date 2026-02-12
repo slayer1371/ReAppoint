@@ -2,10 +2,19 @@ import { getToken } from "next-auth/jwt"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request })
   const pathname = request.nextUrl.pathname
 
-  // Check if user is authenticated
+  // Don't run middleware on auth callback routes - let them complete
+  if (pathname.startsWith("/api/auth/callback")) {
+    return NextResponse.next()
+  }
+
+  // Get token with explicit secret for Vercel edge runtime
+  const token = await getToken({ 
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET
+  })
+  
   const isAuthenticated = !!token
 
   // If authenticated user tries to access auth routes, redirect to dashboard
