@@ -124,8 +124,9 @@ model Appointment {
   aiRiskScore       Int       @default(0) // 0-100 risk score
   riskLevel         String    @default("LOW") // LOW|MEDIUM|HIGH
   pollSentAt        DateTime?
-  pollResponse      String? // "confirmed" | "cancelled" | "no_response"
-  
+  confirmationDeadline DateTime? // User must confirm by this time
+  pollResponse      String? // "confirmed" | "no_response"
+  reminderSent      Boolean   @default(false)
   createdAt         DateTime  @default(now())
   
   business          BusinessProfile @relation(fields: [businessId], references: [id])
@@ -153,6 +154,7 @@ model Waitlist {
   position         Int      // Queue position (1 = first in line)
   status           String   @default("waiting") // waiting|offered|accepted|declined|expired
   offerExpiresAt   DateTime? // 24hr window to accept offer
+  offeredDatetime  DateTime? // The appointment datetime that was offered
   createdAt        DateTime @default(now())
   
   client           ClientProfile   @relation(fields: [clientId], references: [id], onDelete: Cascade)
