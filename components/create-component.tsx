@@ -94,7 +94,10 @@ export default function CreateAppointment() {
         }
 
         try {
-            const datetime = new Date(`${appointmentDate}T${appointmentTime}`)
+            // Create datetime in local timezone, then convert to UTC
+            const datetimeLocal = new Date(`${appointmentDate}T${appointmentTime}`)
+            const offset = datetimeLocal.getTimezoneOffset() * 60000
+            const datetime = new Date(datetimeLocal.getTime() - offset)
             const now = new Date()
 
             if (datetime < now) {
