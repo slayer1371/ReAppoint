@@ -1,6 +1,7 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import type { Appointment } from "@prisma/client";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -41,16 +42,16 @@ export async function GET() {
     });
 
     const completedAppointments = appointmentsThisMonth.filter(
-      a => a.status === "completed"
+      (a) => a.status === "completed"
     ).length;
     const cancelledAppointments = appointmentsThisMonth.filter(
-      a => a.status === "cancelled"
+      (a) => a.status === "cancelled"
     ).length;
     const noShowAppointments = appointmentsThisMonth.filter(
-      a => a.status === "no_show"
+      (a) => a.status === "no_show"
     ).length;
     const confirmedAppointments = appointmentsThisMonth.filter(
-      a => a.status === "confirmed"
+      (a) => a.status === "confirmed"
     ).length;
 
     // Get today's appointments
@@ -89,8 +90,8 @@ export async function GET() {
 
     // Calculate monthly revenue
     const totalRevenue = appointmentsThisMonth
-      .filter(a => a.status === "completed")
-      .reduce((sum, a) => sum + a.price, 0);
+      .filter((a: Appointment) => a.status === "completed")
+      .reduce((sum: number, a: Appointment) => sum + a.price, 0);
 
     return Response.json({
       businessProfile,
