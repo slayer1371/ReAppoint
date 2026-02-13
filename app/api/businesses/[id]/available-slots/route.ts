@@ -31,17 +31,12 @@ export async function GET(
             }
         }
 
-        // Parse the date string (YYYY-MM-DD format)
+        // Parse the date string (YYYY-MM-DD format) as a UTC date
         const [year, month, day] = date.split("-").map(Number)
         
-        // Create local date range (for slot generation)
-        const localDayStart = new Date(year, month - 1, day, 0, 0, 0, 0)
-        const localDayEnd = new Date(year, month - 1, day, 23, 59, 59, 999)
-        
-        // Convert to UTC for database query
-        // When we create a local date and call getTime(), it gives us UTC milliseconds
-        const utcDayStart = new Date(localDayStart.getTime())
-        const utcDayEnd = new Date(localDayEnd.getTime())
+        // Get business hours start/end for the selected date (in UTC)
+        const utcDayStart = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0))
+        const utcDayEnd = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999))
 
         // Get all appointments for this business on this date (excluding cancelled)
         const appointments = await prisma.appointment.findMany({
@@ -58,19 +53,18 @@ export async function GET(
             include: { service: true }
         })
 
-        // Generate 30-minute slots between 9 AM and 5 PM
+        // Generate 30-minute slots between 9 AM and 5 PM (in UTC for database consistency)
         const slots: TimeSlot[] = []
         const businessHours = { start: 9, end: 18 } // 9 AM to 6 PM (18:00)
 
         for (let hour = businessHours.start; hour < businessHours.end; hour++) {
             for (let minutes = 0; minutes < 60; minutes += 30) {
-                // Create slot times in local timezone
-                const slotStart = new Date(year, month - 1, day, hour, minutes, 0, 0)
+                // Create slot times in UTC
+                const slotStart = new Date(Date.UTC(year, month - 1, day, hour, minutes, 0, 0))
                 const slotEnd = new Date(slotStart.getTime() + serviceDurationMins * 60 * 1000)
 
                 // If service duration extends beyond business hours, mark as unavailable
-                // Create closing time boundary
-                const closingTime = new Date(year, month - 1, day, businessHours.end, 0, 0, 0)
+                const closingTime = new Date(Date.UTC(year, month - 1, day, businessHours.end, 0, 0, 0))
                 if (slotEnd > closingTime) {
                     const timeStr = `${hour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`
                     slots.push({
@@ -86,6 +80,7 @@ export async function GET(
                 let blockedBy: string | undefined
 
                 for (const apt of appointments) {
+                    // Convert UTC datetime to local time for comparison
                     const aptStart = new Date(apt.datetime)
                     const aptEnd = new Date(aptStart.getTime() + apt.durationMins * 60 * 1000)
 
