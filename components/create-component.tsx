@@ -94,10 +94,9 @@ export default function CreateAppointment() {
         }
 
         try {
-            // Create datetime in local timezone, then convert to UTC
-            const datetimeLocal = new Date(`${appointmentDate}T${appointmentTime}`)
-            const offset = datetimeLocal.getTimezoneOffset() * 60000
-            const datetime = new Date(datetimeLocal.getTime() - offset)
+            // Create datetime - JavaScript automatically handles timezone conversion
+            // when parsing local time string, storing it correctly as UTC internally
+            const datetime = new Date(`${appointmentDate}T${appointmentTime}`)
             const now = new Date()
 
             if (datetime < now) {
