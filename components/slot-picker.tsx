@@ -44,8 +44,12 @@ export function SlotPicker({
             setError(null)
 
             try {
+                // Get user's timezone
+                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
                 const url = new URL(`/api/businesses/${businessId}/available-slots`, window.location.origin)
                 url.searchParams.append("date", selectedDate)
+                url.searchParams.append("timezone", timezone)
                 if (serviceId) {
                     url.searchParams.append("serviceId", serviceId)
                 }
