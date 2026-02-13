@@ -67,7 +67,7 @@ export async function POST(req: Request) {
   }
 
   const body = await req.json();
-  const { businessId, serviceId } = body;
+  const { businessId, serviceId, timezone } = body;
 
   if (!businessId || !serviceId) {
     return Response.json(
@@ -109,6 +109,7 @@ export async function POST(req: Request) {
       businessId,
       serviceId,
       position: newPosition,
+      timezone: timezone || "America/New_York", // Store user's timezone
       status: "waiting"
     },
     include: {

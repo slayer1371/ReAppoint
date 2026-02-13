@@ -56,7 +56,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
-    const { businessId, serviceId, datetime, waitlistId } = body
+    const { businessId, serviceId, datetime, waitlistId, timezone } = body
 
     // Validate required fields
     if (!businessId || !serviceId || !datetime) {
@@ -177,6 +177,7 @@ export async function POST(req: Request) {
             isReturningClient,
             aiRiskScore,
             riskLevel,
+            timezone: timezone || "America/New_York", // Store user's timezone for email formatting
             status: "confirmed"
         },
         include: {
@@ -203,7 +204,8 @@ export async function POST(req: Request) {
             service.name,
             appointmentDate,
             service.durationMins,
-            service.basePrice
+            service.basePrice,
+            timezone
         );
     } catch (error) {
         console.error("Failed to send booking confirmation email:", error);

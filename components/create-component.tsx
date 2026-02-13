@@ -105,6 +105,9 @@ export default function CreateAppointment() {
                 return
             }
 
+            // Get user's timezone for email formatting
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
             const res = await fetch("/api/appointment-data", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -112,6 +115,7 @@ export default function CreateAppointment() {
                     businessId: selectedBusiness,
                     serviceId: selectedService,
                     datetime: datetime.toISOString(),
+                    timezone,
                     ...(waitlistId && { waitlistId })  // Include waitlistId if present
                 })
             })
@@ -150,12 +154,16 @@ export default function CreateAppointment() {
         setError(null)
 
         try {
+            // Get user's timezone for email formatting
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
             const res = await fetch("/api/waitlist", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     businessId: selectedBusiness,
-                    serviceId: selectedService
+                    serviceId: selectedService,
+                    timezone
                 })
             })
 

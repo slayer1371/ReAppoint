@@ -79,6 +79,7 @@ export async function GET(req: Request) {
         isReturningClient: waitlistEntry.client.totalAppointments > 0,
         aiRiskScore: 20, // Lower risk since they confirmed interest via waitlist
         riskLevel: "LOW",
+        timezone: waitlistEntry.timezone, // Use the timezone from waitlist entry
         status: "confirmed",
         pollResponse: "confirmed" // Auto-confirm since they claimed the offer
       },
@@ -110,7 +111,8 @@ export async function GET(req: Request) {
         waitlistEntry.service.name,
         newAppointment.datetime,
         waitlistEntry.service.durationMins,
-        waitlistEntry.service.basePrice
+        waitlistEntry.service.basePrice,
+        waitlistEntry.timezone
       );
     } catch (error) {
       console.error("Failed to send confirmation email:", error);

@@ -3,6 +3,44 @@ import { prisma } from "@/lib/prisma";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
+// Helper function to format date/time in user's timezone
+function formatDateTimeInTimezone(datetime: Date, timezone: string) {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: timezone
+  };
+  
+  return new Intl.DateTimeFormat("en-US", options).format(datetime);
+}
+
+function formatDateInTimezone(datetime: Date, timezone: string) {
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    timeZone: timezone
+  };
+  
+  return new Intl.DateTimeFormat("en-US", options).format(datetime);
+}
+
+function formatTimeInTimezone(datetime: Date, timezone: string) {
+  const options: Intl.DateTimeFormatOptions = {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: timezone
+  };
+  
+  return new Intl.DateTimeFormat("en-US", options).format(datetime);
+}
+
 export async function sendVerificationEmail(email: string) {
   // 1. Generate a random 6-digit code
   const token = Math.floor(100000 + Math.random() * 900000).toString();
@@ -37,18 +75,11 @@ export async function sendWaitlistOfferEmail(
   businessName: string,
   serviceName: string,
   datetime: Date,
-  offerToken: string
+  offerToken: string,
+  timezone: string = "America/New_York"
 ) {
-  const formattedDate = datetime.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric"
-  });
-  
-  const formattedTime = datetime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+  const formattedDate = formatDateInTimezone(datetime, timezone);
+  const formattedTime = formatTimeInTimezone(datetime, timezone);
 
   const claimLink = `${process.env.NEXTAUTH_URL}/api/waitlist/claim?token=${offerToken}`;
   const declineLink = `${process.env.NEXTAUTH_URL}/api/waitlist/decline?token=${offerToken}`;
@@ -96,18 +127,11 @@ export async function sendAppointmentReminderEmail(
   businessName: string,
   serviceName: string,
   datetime: Date,
-  confirmationToken: string
+  confirmationToken: string,
+  timezone: string = "America/New_York"
 ) {
-  const formattedDate = datetime.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric"
-  });
-  
-  const formattedTime = datetime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+  const formattedDate = formatDateInTimezone(datetime, timezone);
+  const formattedTime = formatTimeInTimezone(datetime, timezone);
 
   const confirmationLink = `${process.env.NEXTAUTH_URL}/api/appointment/confirm?token=${confirmationToken}`;
 
@@ -153,19 +177,11 @@ export async function sendBookingConfirmationEmail(
   serviceName: string,
   datetime: Date,
   durationMins: number,
-  price: number
+  price: number,
+  timezone: string = "America/New_York"
 ) {
-  const formattedDate = datetime.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric"
-  });
-  
-  const formattedTime = datetime.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+  const formattedDate = formatDateInTimezone(datetime, timezone);
+  const formattedTime = formatTimeInTimezone(datetime, timezone);
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

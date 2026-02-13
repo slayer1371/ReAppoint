@@ -2,8 +2,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// so user b is in waitlist right now. when user a cancels his appointment, slots will be available for user b. but can't send an email to user b, because resend doesn't let you if you don't have a domain
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -119,6 +117,7 @@ model Appointment {
   bookingWindowDays Int       // How many days in advance was this booked
   appointmentHour   Int       // Hour of day (0-23) for time-of-day patterns
   isReturningClient Boolean   @default(false)
+  timezone          String    @default("America/New_York") // User's timezone for email formatting
   
   // Prediction & confirmation
   aiRiskScore       Int       @default(0) // 0-100 risk score
@@ -155,6 +154,7 @@ model Waitlist {
   status           String   @default("waiting") // waiting|offered|accepted|declined|expired
   offerExpiresAt   DateTime? // 24hr window to accept offer
   offeredDatetime  DateTime? // The appointment datetime that was offered
+  timezone         String   @default("America/New_York") // User's timezone for email formatting
   createdAt        DateTime @default(now())
   
   client           ClientProfile   @relation(fields: [clientId], references: [id], onDelete: Cascade)

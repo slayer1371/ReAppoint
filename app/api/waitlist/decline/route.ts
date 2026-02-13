@@ -72,14 +72,15 @@ export async function GET(req: Request) {
         // Create offer token
         const offerToken = `${nextInQueue.id}_${Date.now()}`;
 
-        // Send offer email to next person
+        // Send offer email to next person using waitlist's timezone
         await sendWaitlistOfferEmail(
           nextInQueue.client.user.email!,
           nextInQueue.client.user.name || "Client",
           waitlistEntry.business.businessName,
           waitlistEntry.service.name,
           waitlistEntry.offeredDatetime,
-          offerToken
+          offerToken,
+          waitlistEntry.timezone
         );
 
         // Update waitlist entry to offered status
@@ -89,7 +90,8 @@ export async function GET(req: Request) {
           data: {
             status: "offered",
             offerExpiresAt: offerDeadline,
-            offeredDatetime: waitlistEntry.offeredDatetime
+            offeredDatetime: waitlistEntry.offeredDatetime,
+            timezone: waitlistEntry.timezone // Inherit timezone from declining user
           }
         });
 

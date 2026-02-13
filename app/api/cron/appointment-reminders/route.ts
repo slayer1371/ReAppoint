@@ -49,7 +49,8 @@ export async function GET(req: Request) {
           apt.business.businessName,
           apt.service.name,
           apt.datetime,
-          confirmationToken
+          confirmationToken,
+          apt.timezone
         );
 
         // Set confirmation deadline: 2 hours before appointment (or sooner if less time remains)
@@ -124,14 +125,15 @@ export async function GET(req: Request) {
             // Create offer token
             const offerToken = `${nextInQueue.id}_${Date.now()}`;
 
-            // Send offer email
+            // Send offer email using the appointment's timezone
             await sendWaitlistOfferEmail(
               nextInQueue.client.user.email!,
               nextInQueue.client.user.name || "Client",
               apt.business.businessName,
               apt.service.name,
               apt.datetime,
-              offerToken
+              offerToken,
+              apt.timezone
             );
 
             // Update waitlist entry to offered status
