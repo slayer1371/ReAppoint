@@ -39,7 +39,7 @@ export default function Verifypagecomponent() {
           <p className="text-sm text-gray-500">We sent a code to {email}</p>
         </CardHeader>
         {/* The master code is 111111, since I haven't bought a domain for this project. */}
-        <p className="text-sm text-gray-500 px-6">The master code is 111111, since I haven&apos;t bought a domain for this project yet, and Resend doesn&apos;t support sending emails without a domain name.</p>
+        <p className="text-sm text-gray-500 px-6">Check your spam folder for the verification code!</p>
         
         <CardContent className="space-y-4">
           <Input 
